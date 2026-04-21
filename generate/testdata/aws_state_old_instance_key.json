@@ -1,0 +1,40 @@
+{
+  "version": 4,
+  "terraform_version": "0.15.3",
+  "serial": 0,
+  "lineage": "c6ec2564-96cc-5eae-6bb6-7da365525531",
+  "outputs": {},
+  "resources": [
+    {
+      "mode": "managed",
+      "type": "aws_instance",
+      "name": "web",
+      "provider": "provider[\"registry.terraform.io/-/aws\"]",
+      "instances": [
+        {
+          "schema_version": 1,
+          "attributes": { "id": "i-00000000000000001" },
+          "sensitive_attributes": [],
+          "dependencies": ["aws_security_group.web.0"]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_security_group",
+      "name": "web",
+      "provider": "provider[\"registry.terraform.io/-/aws\"]",
+      "instances": [
+        {
+          "schema_version": 1,
+          "attributes": {
+            "id": "sg-00000000000000001",
+            "ingress": [],
+            "egress": []
+          },
+          "sensitive_attributes": []
+        }
+      ]
+    }
+  ]
+}

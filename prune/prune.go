@@ -21,6 +21,10 @@ import (
 // reARN matches an arn string
 var reARN = regexp.MustCompile("^arn:*")
 
+// reOldInstanceKey matches old-style resource instance keys like aws_instance.foo.0
+// that appear in TFState dependency strings from Terraform <0.12
+var reOldInstanceKey = regexp.MustCompile(`([a-z_][a-z0-9_]*\.[a-zA-Z0-9_-]+)\.\d+"`)
+
 // Prune will prune the tfstate of unneeded information and if replaceCanonicals is specified
 // the resource canonicals will also be changed, for exmple 'aws_lb.front' will be changed to
 // a random name like 'aws_lb.XptaK'
@@ -28,6 +32,7 @@ func Prune(tfstate json.RawMessage, replaceCanonicals bool) (json.RawMessage, er
 	// Since TF 0.13 'depends_on' has been dropped, so we do a manual
 	// replace from '"depends_on"' to '"dependencies"'
 	tfstate = bytes.ReplaceAll(tfstate, []byte("\"depends_on\""), []byte("\"dependencies\""))
+	tfstate = reOldInstanceKey.ReplaceAll(tfstate, []byte(`$1"`))
 	err := generate.ValidateTFStateVersion(tfstate)
 	if err != nil {
 		return nil, fmt.Errorf("error while validating TFStateVersion: %w", err)

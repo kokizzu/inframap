@@ -293,6 +293,29 @@ func TestFromState_AWS(t *testing.T) {
 		assertEqualGraph(t, eg, g, cfg)
 	})
 
+	t.Run("OldInstanceKeyInDependencies", func(t *testing.T) {
+		// Regression test: TFState files from older Terraform versions use
+		// "aws_security_group.foo.0" instead of "aws_security_group.foo[0]"
+		// in dependency addresses. Verify this is handled correctly.
+		src, err := ioutil.ReadFile("./testdata/aws_state_old_instance_key.json")
+		require.NoError(t, err)
+
+		g, cfg, err := generate.FromState(src, generate.Options{Clean: true, Connections: true})
+		require.NoError(t, err)
+		require.NotNil(t, g)
+		require.NotNil(t, cfg)
+
+		eg := &graph.Graph{
+			Nodes: []*graph.Node{
+				{
+					Canonical: "aws_instance.web",
+					Name:      "i-00000000000000001",
+				},
+			},
+		}
+
+		assertEqualGraph(t, eg, g, cfg)
+	})
 	t.Run("WithCount", func(t *testing.T) {
 		src, err := ioutil.ReadFile("./testdata/aws_state_with_count.json")
 		require.NoError(t, err)
